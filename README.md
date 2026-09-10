@@ -1,29 +1,23 @@
 # Saving Group — Loan Management System
-### School Project | Built with AI assistance
 
----
-
-## What this app does
-
-This app replaces the Excel spreadsheet system for managing a saving group.
-It stores all data securely in a database (SQLite) and runs as a Windows desktop app.
-
----
+> A Windows desktop app that replaces the Excel spreadsheet for managing a
+> 48–50 member saving group — loans, daily interest, quarterly savings, audits,
+> and statements, all in one secure local database.
+>
+> _School project · Built with AI assistance._
 
 ## Features
 
 | Feature | Description |
-|---|---|
-| 🔐 Login / Password | Username + password login. Only authorised users can access |
-| 👥 Members | Add, edit, deactivate members. Search by name |
-| 💳 Loans | Issue loans, record repayments, auto-calculate interest (10% p.a. daily) |
-| 💵 Savings | Record quarterly savings (Rs 6,000 default). Bulk entry for all members at once |
+| --- | --- |
+| 🔐 Login / Password | Authorized-access only; PBKDF2-SHA256 password hashing |
+| 👥 Members | Add, edit, deactivate members; search by name; inline cell editing |
+| 💳 Loans | Issue loans with per-loan interest (10% p.a. default), daily interest, principal/interest repayment split, "interest waived" flag |
+| 💵 Savings | Quarterly records (Rs 6,000 default), one-click bulk entry, auto-transfer from repayments |
 | 📊 Reports | Export Active Loans, Savings, Quarterly Statement to Excel |
-| 📋 Audit Log | Every action (who did what, when) is permanently recorded |
-| 📂 Import Excel | Import member names from your old Excel file |
-| ⚙️ Settings | Change password, configure the system |
-
----
+| 📋 Audit Log | Every action (who / what / when) permanently recorded |
+| 📂 Import Excel | Import member names from the old spreadsheet |
+| ⚙️ Settings | Change password, import members, configure system |
 
 ## Interest Formula
 
@@ -31,70 +25,70 @@ It stores all data securely in a database (SQLite) and runs as a Windows desktop
 Interest = Principal × 10% × Days / 365
 ```
 
-This matches exactly how the original Excel was calculating daily interest.
+This matches exactly how the original Excel calculated daily interest.
 
----
+## Getting Started
 
-## How to build the .exe (Windows)
+### Run from source (any OS with Python)
 
-### Requirements
-- Windows 10 or 11
-- Python 3.10 or higher installed from https://python.org
-  - ⚠️ During install, check "Add Python to PATH"
+```bash
+pip install -r requirements.txt   # customtkinter, pillow, openpyxl
+python app.py
+```
 
-### Steps
-1. Put all files in one folder:
-   - `app.py`
-   - `BUILD_EXE.bat`
-   - `requirements.txt`
+### Build the .exe (Windows)
 
-2. Double-click `BUILD_EXE.bat`
+1. Install **Python 3.10+** from <https://python.org> — tick **"Add Python to PATH"**.
+2. Double-click **`BUILD_EXE.bat`**.
+3. Wait 2–3 minutes until it says `Done!`.
+4. Grab your standalone app from `dist\SavingGroup_LoanManagement.exe`.
 
-3. Wait 2–3 minutes. It will say "Done!" when finished.
+> A prebuilt exe is also shipped inside `dist\` for convenience.
 
-4. Your app is in the `dist` folder: `SavingGroup_LoanManagement.exe`
+### First Run
 
-5. Copy the `.exe` file anywhere you want. It works standalone.
+- Login with **`admin` / `admin123`**, then **Settings → Change Password immediately**.
+- Import existing members: Settings → Import Members.
 
----
+## Tech Stack
 
-## First Run
+| Layer        | Technology                                     |
+| ------------ | ---------------------------------------------- |
+| Language     | Python 3.10+                                   |
+| GUI          | CustomTkinter ≥ 5.2.0                          |
+| Database     | SQLite (stdlib, WAL mode)                      |
+| Excel        | openpyxl (export/import)                       |
+| Build        | PyInstaller (onefile, via `BUILD_EXE.bat`)     |
 
-1. Open `SavingGroup_LoanManagement.exe`
-2. Login with:
-   - Username: `admin`
-   - Password: `admin123`
-3. **Go to Settings → Change Password immediately!**
-4. Import your existing members from Excel using Settings → Import Members
+## Project Structure
 
----
+```
+├── app.py                # entry point: LoginWindow + MainApp (sidebar UI)
+├── db.py                 # schema + data access
+├── services.py           # business logic (loans, interest, statements)
+├── ui_tables.py          # editable tree tables
+├── views_statement.py    # quarterly statement engine
+├── BUILD_EXE.bat         # one-click PyInstaller build
+├── *.spec                # PyInstaller specs
+└── data/saving_group.db  # runtime database (back this up!)
+```
 
-## Database
+## Database & Backup
 
-The database file (`saving_group.db`) is created in the same folder as the `.exe`.
-- **Back it up regularly** — copy it to a USB drive or Google Drive
-- All your data is in this one file
-- Never delete it unless you want to start fresh
+Everything lives in one SQLite file: `saving_group.db` (in the same folder as
+the app).
 
----
+- **Back it up regularly** — copy it to USB or Google Drive.
+- The app runs **completely offline** — no network needed.
 
-## Security Features
+## Security
 
-- Passwords are stored as SHA-256 hashes (never in plain text)
-- Every action is recorded in the Audit Log with timestamp and username
-- Database uses foreign key constraints to prevent orphaned data
-- No network connection needed — runs completely offline
+- Passwords stored as salted PBKDF2-SHA256 hashes (never plain text)
+- Legacy SHA-256 fallback for older accounts
+- Foreign-key constraints prevent orphaned data
+- Full audit log with timestamp + username
+- DB integrity check on startup
 
----
+## License
 
-## If you need help
-
-The app was built to match exactly how the Excel file worked:
-- 48–50 members
-- Quarterly savings of Rs 6,000
-- Loans with 10% annual interest, calculated daily
-- Quarterly statements showing principal + interest + savings
-
----
-
-*Built as a school project using Python + CustomTkinter + SQLite*
+See the LICENSE file in this repository.
